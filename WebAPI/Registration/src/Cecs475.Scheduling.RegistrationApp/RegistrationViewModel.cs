@@ -49,5 +49,9 @@ namespace Cecs475.Scheduling.RegistrationApp
         /// The full name of the student who is registering.
         /// </summary>
         public string FullName { get; set; }
+
+        public List<CourseSectionDto> SectionList { get; set; }
+
+        public List<SemesterTermDto> SemesterList { get; set; }
     }
 }
