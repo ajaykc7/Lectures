@@ -42,7 +42,7 @@ namespace Cecs475.Scheduling.RegistrationApp {
 		}
 
 		private void mRegisterBtn_Click(object sender, RoutedEventArgs e) {
-			string[] courseSplit = mCourseText.Text.Split('-');
+			string[] courseSplit = mCourseCombo.Text.Split('-');
 			int sectionNum = Convert.ToInt32(courseSplit[1]);
 			string[] nameSplit = courseSplit[0].Split(' ');
 
@@ -81,7 +81,7 @@ namespace Cecs475.Scheduling.RegistrationApp {
 		}
 
 		private async void mAsyncBtn_Click(object sender, RoutedEventArgs e) {
-			string[] courseSplit = mCourseText.Text.Split('-');
+			string[] courseSplit = mCourseCombo.Text.Split('-');
 			int sectionNum = Convert.ToInt32(courseSplit[1]);
 			string[] nameSplit = courseSplit[0].Split(' ');
 
@@ -142,5 +142,39 @@ namespace Cecs475.Scheduling.RegistrationApp {
 				}
 			}
 		}
-	}
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var client = new RestClient(ViewModel.ApiUrl);
+            var request = new RestRequest("api/schedule/terms", Method.GET);
+
+            var task = client.ExecuteTaskAsync(request);
+            var response = await task;
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                MessageBox.Show("Semester not found");
+            }
+            else
+            {
+                ViewModel.SemesterList = response.Content;
+
+                JObject obj = JObject.Parse(response.Content);
+            }
+            
+        }
+
+        private async void SemesterCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox box = sender as ComboBox;
+            var client = new RestClient(ViewModel.ApiUrl);
+            var request = new RestRequest("api/schedule/{id}", Method.GET);
+
+            request.AddUrlSegment("id", box.SelectedItem.ToString());
+
+            var task = client.ExecuteTaskAsync(request);
+            var response = await task;
+
+        }
+    }
 }
